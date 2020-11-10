@@ -4,18 +4,25 @@ import { useEffect, useState } from 'react';
 import { Item } from "../models/Item";
 import { ButtonEvent, Element } from '../models/Types'
 
-function Row(props: {item: Item, onClick: (id: string | undefined, e: ButtonEvent) => void }): Element {
+function Row(props: {
+  item: Item,
+  getShow: (id: string | undefined, e: ButtonEvent) => void,
+  getEdit: (id: string | undefined, e: ButtonEvent) => void }): Element {
   return(
     <tr key={props.item.id}>
       <td>{props.item.name}</td>
       <td>{props.item.date_purchased}</td>
       <td>{props.item.category}</td>
-      <td><button onClick={ (e: ButtonEvent) => props.onClick(props.item.id, e) }>Show</button></td>
+      <td><button onClick={ (e: ButtonEvent) => props.getShow(props.item.id, e) }>Show</button></td>
+      <td><button onClick={ (e: ButtonEvent) => props.getEdit(props.item.id, e) }>Edit</button></td>
     </tr>
   )
 }
 
-export const Index: (props: { authToken: string, show: (id: string | undefined, e: ButtonEvent) => void }) => Element = (props) => {
+export const Index: (props: {
+  authToken: string,
+  getShow: (id: string | undefined, e: ButtonEvent) => void,
+  getEdit: (id: string | undefined, e: ButtonEvent) => void }) => Element = (props) => {
   const [items, setItems] = useState<Array<Item>>([])
 
   useEffect(() => {
@@ -43,7 +50,7 @@ export const Index: (props: { authToken: string, show: (id: string | undefined, 
           <th>Category</th>
           <th></th>
         </tr>
-        {items.map((item, _) => { return <Row item={item} onClick={props.show} /> })}
+        {items.map((item, _) => { return <Row item={item} getShow={props.getShow} getEdit={props.getEdit} /> })}
       </tbody>
     </table>
   )

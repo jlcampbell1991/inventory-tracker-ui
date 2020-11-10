@@ -26,8 +26,7 @@ export const App: () => Element = () => {
   const [itemId, setItemId] = useState<string>("");
   const [page, setPage] = useState<Page>(Page.Login);
 
-
-  function handleSignupClick(body: SignupBody, e: InputEvent): void {
+  function handleSignupSubmit(body: SignupBody, e: InputEvent): void {
     e.preventDefault();
     $.ajax({
         type: 'POST',
@@ -47,7 +46,7 @@ export const App: () => Element = () => {
     });
   }
 
-  function handleLoginClick(body: LoginBody, e: InputEvent): void {
+  function handleLoginSubmit(body: LoginBody, e: InputEvent): void {
     e.preventDefault();
     $.ajax({
         type: 'POST',
@@ -72,8 +71,9 @@ export const App: () => Element = () => {
     setPage(page);
   }
 
-  function handleAddClick(item: Item, e: InputEvent): void {
+  function handleAddSubmit(item: Item, e: InputEvent): void {
     e.preventDefault();
+    console.log(JSON.stringify(item));
     $.ajax({
         type: 'POST',
         headers: {
@@ -93,18 +93,34 @@ export const App: () => Element = () => {
     });
   }
 
-  function handleEditClick(item: Item, e: InputEvent): void {
+  function handleEditClick(itemId: string | undefined, e: ButtonEvent): void {
     e.preventDefault();
+    if(itemId) {
+      setItemId(itemId);
+      setPage(Page.Edit);
+    }
+  }
+
+  function handleUpdateSubmit(item: Item, e: InputEvent) {
+    e.preventDefault();
+    console.log(JSON.stringify(item));
     $.ajax({
         type: 'POST',
         headers: {
           "auth_token": authToken
         },
-        url: `http://localhost:8080/api/v1/item/${item.id}/update`,
+        url: `http://localhost:8080/api/v1/item/update`,
         contentType: 'application/json',
+        processData: false,
         data: JSON.stringify(item),
-        success: function(_) {
-          setPage(Page.Index);
+        success: function(data: Item) {
+          if(data.id) {
+            // TODO: Simplify this
+            setItemId(data.id);
+            setPage(Page.Show);
+          } else {
+            setPage(Page.Index);
+          }
         },
         error: function(_, status, error) {
           alert(status + " - " + error);
@@ -116,27 +132,49 @@ export const App: () => Element = () => {
   function handleShowClick(itemId: string | undefined, e: ButtonEvent) {
     e.preventDefault();
     if(itemId) {
+      // TODO: Simplify this
       setItemId(itemId);
       setPage(Page.Show)
     }
   }
 
   function getPage(): Element {
-    const login: Element = <Login onClick={ (u: string, p: string, e: InputEvent) => handleLoginClick({username: u, password: p}, e)} />;
+    const login: Element = <Login
+      loginSubmit={ (u: string, p: string, e: InputEvent) => handleLoginSubmit({username: u, password: p}, e)}
+      signupClick={ (e: ButtonEvent) => handleClickLink(Page.Signup, e) }
+    />;
 
     switch(page) {
       case 0:
         return login;
       case 1:
-        return <Signup onClick={ (u: string, p: string, e: InputEvent) => handleSignupClick({name: u, unencPass: p}, e)} />;
+        return <Signup
+          onClick={ (u: string, p: string, e: InputEvent) =>
+              handleSignupSubmit({name: u, unencPass: p}, e)}
+        />;
       case 2:
-        return <Index authToken={authToken} show={(itemId: string | undefined, e: ButtonEvent) => handleShowClick(itemId, e) } />;
+        return <Index
+          authToken={authToken}
+          getShow={(itemId: string | undefined, e: ButtonEvent) =>
+            handleShowClick(itemId, e) }
+          getEdit={(itemId: string | undefined, e: ButtonEvent) =>
+            handleEditClick(itemId, e) }
+        />;
       case 3:
-        return <Add onClick={handleAddClick}/>;
-      // case 4:
-      //   return <Edit onClick={handleEditClick} />;
+        return <Add authToken={authToken} onClick={handleAddSubmit}/>;
+      case 4:
+        return <Edit
+          authToken={authToken}
+          itemId={itemId}
+          onClick={handleUpdateSubmit}
+        />;
       case 5:
-        return <Show authToken={authToken} itemId={itemId} />
+        return <Show
+          authToken={authToken}
+          itemId={itemId}
+          onClick={(itemId: string | undefined, e: ButtonEvent) =>
+            handleEditClick(itemId, e) }
+        />
       default:
         return login;
     }
