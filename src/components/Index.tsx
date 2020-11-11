@@ -13,11 +13,11 @@ function Row(props: {
 
   return(
     <tr key={props.item.id} className="row">
-      <td className='col'>{props.item.name}</td>
-      <td className='col'>{date.toLocaleString()}</td>
-      <td className='col'>{props.item.category}</td>
-      <td className='col'><button onClick={ (e: ButtonEvent) => props.getShow(props.item.id, e) }>Show</button></td>
-      <td className='col'><button onClick={ (e: ButtonEvent) => props.getEdit(props.item.id, e) }>Edit</button></td>
+      <th scope="row">{props.item.name}</th>
+      <td>{date.toLocaleString()}</td>
+      <td>{props.item.category}</td>
+      <td><button onClick={ (e: ButtonEvent) => props.getShow(props.item.id, e) }>Show</button></td>
+      <td><button onClick={ (e: ButtonEvent) => props.getEdit(props.item.id, e) }>Edit</button></td>
     </tr>
   )
 }
@@ -45,17 +45,21 @@ export const Index: (props: {
   }, [])
 
   return(
-    <table className='container-fluid'>
-      <tbody>
-        <tr key='indexHeader' className='row'>
-          <th className='col'>Name</th>
-          <th className='col'>Date Purchased</th>
-          <th className='col'>Category</th>
-          <th className='col'></th>
-          <th className='col'></th>
-        </tr>
-        {items.map((item, _) => { return <Row item={item} getShow={props.getShow} getEdit={props.getEdit} /> })}
-      </tbody>
-    </table>
+    <div id="index-container" className='container-fluid'>
+      <table className='table'>
+        <thead className='thead-light'>
+          <tr key='indexHeader' className='row'>
+            <th scope='col'>Name</th>
+            <th scope='col'>Date Purchased</th>
+            <th scope='col'>Category</th>
+            <th scope='col'>#</th>
+            <th scope='col'>#</th>
+          </tr>
+        </thead>
+        <tbody>
+          {items.map((item, _) => { return <Row item={item} getShow={props.getShow} getEdit={props.getEdit} /> })}
+        </tbody>
+      </table>
+    </div>
   )
 }
