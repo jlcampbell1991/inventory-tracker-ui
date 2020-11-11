@@ -15,15 +15,24 @@ export function Login(props: {
   }
 
   return(
-    <div>
-      <form className="centered">
-        <div>Username: <input type="text" id="username"></input></div>
-        <div>Password: <input type="password" id="password"></input></div>
-        <div><input type="submit" value="Login" onClick={
-          (e: InputEvent) => props.loginSubmit(getUsername(), getPassword(), e)
-        }></input></div>
-      </form>
-      <button onClick={ (e: ButtonEvent) => props.signupClick(e) }>Signup</button>
+    <div id="loginContainer" className="page-header header container-fluid">
+      <div id="loginForm">
+        <form>
+          <div className='form-group'>
+            <label htmlFor="username">Username</label><br/>
+            <input type="text" id="username"/>
+          </div>
+          <div className='form-group'>
+            <label htmlFor="password">Password</label><br/>
+            <input type="password" id="password"/>
+          </div>
+          <div>
+            <input className='btn btn-primary' type="submit" value="Login" onClick={
+            (e: InputEvent) => props.loginSubmit(getUsername(), getPassword(), e) }/>
+            <button className='btn' onClick={ (e: ButtonEvent) => props.signupClick(e) }>Signup</button>
+          </div>
+        </form>
+      </div>
     </div>
   );
 }
